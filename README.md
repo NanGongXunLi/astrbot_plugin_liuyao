@@ -92,6 +92,14 @@ astrbot_plugin_liuyao/
 
 ## 更新日志
 
+### v1.2.0 — 防幻觉校验 & event.send() 自动补丁
+
+- 🔧 **修复**: 新增启动时自动修补 AstrBot 核心框架 `_dispatch_send` 的 `session_id.isdigit()` 类型爆炸问题（int → str 兼容），`event.send(MessageChain)` 现在在群聊中可正常使用
+- 🩹 **机制**: 插件加载时自动检测并修补核心文件，无需手动修改框架，其他插件也能受益
+- 🧠 **防幻觉**: 新增三层数字校验——空值拦截、幻觉数字库（`[1,2,3]` `[6,6,6]` 等）、数字多样度检测，有效防止LLM凭空编造起卦数字
+- 🚫 **防虚空**: 未提供数字或未说明所问之事时直接拒绝，不给幻觉留空间
+- 📝 **兼容**: 已修补过的环境会自动跳过，不影响正常升级
+
 ### v1.1.0 — event.send() 修复补丁
 
 - 🔧 **修复**: 新增启动时自动修补 AstrBot 核心框架 `_dispatch_send` 的 `session_id.isdigit()` 类型爆炸问题（int → str 兼容），`event.send(MessageChain)` 现在在群聊中可正常使用
