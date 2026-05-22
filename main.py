@@ -25,9 +25,38 @@ BLOCKED_KEYWORDS = [
 MAX_NUM, MAX_NUMS = 99999, 10
 
 
+def _patch_core_send():
+    """启动时修补AstrBot核心框架的 event.send() 类型转换bug。"""
+    import re
+    target = "astrbot.core.platform.sources.aiocqhttp.aiocqhttp_message_event"
+    try:
+        import importlib
+        mod = importlib.import_module(target)
+        src = open(mod.__file__, "r", encoding="utf-8").read()
+        # 检查是否已经修补过
+        if "session_id_str = str(session_id)" in src:
+            logger.info("[liuyao] event.send() 补丁已生效，跳过。")
+            return
+        # 修补 _dispatch_send 中的类型转换
+        old = r'(# session_id 必须是纯数字字符串)\s+session_id_int = \(\s+int\(session_id\) if session_id and session_id\.isdigit\(\) else None\s+\)'
+        new = r'\1
+        session_id_str = str(session_id) if session_id is not None else ""
+        session_id_int = int(session_id_str) if session_id_str.isdigit() else None'
+        if re.search(old, src):
+            src = re.sub(old, new, src)
+            with open(mod.__file__, "w", encoding="utf-8") as f:
+                f.write(src)
+            logger.info("[liuyao] event.send() 补丁已应用：_dispatch_send 类型转换修复。")
+        else:
+            logger.warning("[liuyao] event.send() 补丁：未匹配到目标代码段。")
+    except Exception as e:
+        logger.error(f"[liuyao] event.send() 补丁失败: {e}")
+
+
 class LiuYaoPlugin(Star):
     def __init__(self, context: Context):
         super().__init__(context)
+        _patch_core_send()
         logger.info("六爻数理占卜插件已加载")
 
     @llm_tool("liuyao_divinate")
@@ -111,6 +140,6 @@ class LiuYaoPlugin(Star):
             return "数据异常，请重试。"
 
 
-@register("liuyao_plugin", author="南宫墨铭", desc="六爻数理占卜。输入数字自动起卦，输出评分卡片。", version="v1.0.0")
+@register("liuyao_plugin", author="南宫墨铭", desc="六爻数理占卜。输入数字自动起卦，输出评分卡片。", version="v1.1.0")
 def register_plugin():
     return LiuYaoPlugin

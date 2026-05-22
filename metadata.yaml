@@ -2,6 +2,6 @@ name: astrbot_plugin_liuyao
 display_name: 六爻数理占卜
 desc: 基于数字起卦的六爻占卜插件。输入数字自动起卦，基于《增删卜易》《易冒》评分体系，输出评分卡片。支持回头生、刑冲害、世应分析。
 help: 发送数字如 [6,4,2] 加问题即可起卦
-version: v1.0.0
+version: v1.1.0
 author: 南宫墨铭
 repo: https://github.com/
