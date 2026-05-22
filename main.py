@@ -87,19 +87,44 @@ class LiuYaoPlugin(Star):
         # 检测常见幻觉模式：纯猜测的默认数字
         if len(numbers) == 1 and numbers[0] <= 8:
             return f"数字{numbers[0]}过小，起卦需要有效数字组合。请提供3个或更多数字。"
-        _hallucination_patterns = [
-            [1, 2, 3], [3, 2, 1], [6, 6, 6], [8, 8, 8],
-            [1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 4, 4],
-            [5, 5, 5], [7, 7, 7], [9, 9, 9],
-        ]
-        if numbers[:3] in _hallucination_patterns:
-            return "数字过于规律，请使用区别于顺序或重复数字的有效组合起卦，重复数字最多1组。如果确实要用，可以混合其他数字一起。"
+        _hallucination_patterns = {
+            tuple([1, 2, 3]): 1, tuple([3, 2, 1]): 1,
+            tuple([2, 3, 4]): 1, tuple([4, 3, 2]): 1,
+            tuple([3, 4, 5]): 1, tuple([5, 4, 3]): 1,
+            tuple([4, 5, 6]): 1, tuple([6, 5, 4]): 1,
+            tuple([5, 6, 7]): 1, tuple([7, 6, 5]): 1,
+            tuple([6, 7, 8]): 1, tuple([8, 7, 6]): 1,
+            tuple([7, 8, 9]): 1, tuple([9, 8, 7]): 1,
+            tuple([1, 1, 1]): 1, tuple([2, 2, 2]): 1,
+            tuple([3, 3, 3]): 1, tuple([4, 4, 4]): 1,
+            tuple([5, 5, 5]): 1, tuple([6, 6, 6]): 1,
+            tuple([7, 7, 7]): 1, tuple([8, 8, 8]): 1,
+            tuple([9, 9, 9]): 1,
+            tuple([2, 4, 6]): 1, tuple([6, 4, 2]): 1,
+            tuple([3, 6, 9]): 1, tuple([9, 6, 3]): 1,
+            tuple([1, 4, 7]): 1, tuple([7, 4, 1]): 1,
+            tuple([2, 5, 8]): 1, tuple([8, 5, 2]): 1,
+            tuple([4, 8, 6]): 1,
+        }
+        if len(numbers) >= 3 and tuple(numbers[:3]) in _hallucination_patterns:
+            return "数字过于规律，请使用区别于顺序或重复数字的有效组合起卦。如果确实要用，可以混合其他数字一起。"
         # 检查是否包含过多相同数字
         from collections import Counter
         counts = Counter(numbers)
         most_common_count = counts.most_common(1)[0][1]
         if len(numbers) >= 3 and most_common_count >= len(numbers) - 1 and len(counts) <= 2:
             return "数字过于集中，请使用多样化的数字起卦。"
+        # 从原始用户消息验证数字来源（防LLM瞎编）
+        try:
+            raw_msg = event.get_message_str() if event else ""
+            if raw_msg:
+                input_digits = "".join(str(n) for n in numbers)
+                cleaned_msg = raw_msg.replace(" ", "").replace(",", "").replace("[", "").replace("]", "")
+                if input_digits not in cleaned_msg:
+                    logger.warning(f"[liuyao] 数字未在用户消息中找到: numbers={numbers}")
+                    return "检测到数字并非来自用户输入，请重新提供明确的起卦数字，例如：224，测今日运势。"
+        except Exception as e:
+            logger.debug(f"[liuyao] 原始消息校验跳过: {e}")
 
         for kw in BLOCKED_KEYWORDS:
             if kw in question:
