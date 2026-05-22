@@ -5,7 +5,7 @@
     "default": true
   },
   "detail_level": {
-    "type": "enum",
+    "type": "string",
     "description": "解卦详细程度。精简=只出分数，标准=分数+成因，完整=分数+成因+排盘",
     "default": "标准",
     "choices": ["精简", "标准", "完整"]
