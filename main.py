@@ -89,10 +89,18 @@ class LiuYaoPlugin(Star):
             result["_cause"] = "，".join(parts) if parts else "综合因素影响"
 
             card_path = generate_card(result)
-            if event and hasattr(event, 'reply'):
-                await event.reply([
-                    {"type": "image", "path": card_path}
-                ])
+            
+            # 发图（兼容私聊和群聊）
+            try:
+                if event and hasattr(event, 'reply'):
+                    await event.reply([{"type": "image", "path": card_path}])
+                else:
+                    from astrbot.api import logger as lg
+                    lg.warning("liuyao: event无reply方法")
+            except Exception as reply_err:
+                from astrbot.api import logger as lg
+                lg.error(f"liuyao发图失败: {reply_err}")
+            
             return ""
 
         except Exception as e:
