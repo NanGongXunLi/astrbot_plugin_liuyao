@@ -101,3 +101,9 @@ astrbot_plugin_liuyao/
 **来自本体的一句：**
 
 ![聊天记录](chat.jpg)
+
+<details>
+<summary>🥚 彩蛋</summary>
+
+![彩蛋](easter_egg.jpg)
+</details>
