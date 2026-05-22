@@ -94,9 +94,15 @@ class LiuYaoPlugin(Star):
             try:
                 if event and hasattr(event, 'reply'):
                     await event.reply([{"type": "image", "path": card_path}])
+                elif event and hasattr(event, 'send'):
+                    await event.send([{"type": "image", "path": card_path}])
+                elif event and hasattr(event, 'respond'):
+                    await event.respond([{"type": "image", "path": card_path}])
                 else:
-                    from astrbot.api import logger as lg
-                    lg.warning("liuyao: event无reply方法")
+                    await self.context.send_message(
+                        event.unified_msg_origin,
+                        [{"type": "image", "path": card_path}]
+                    )
             except Exception as reply_err:
                 from astrbot.api import logger as lg
                 lg.error(f"liuyao发图失败: {reply_err}")
