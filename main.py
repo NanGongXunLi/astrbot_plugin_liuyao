@@ -10,7 +10,8 @@ astrbot_plugin_liuyao - 六爻数理占卜
 """
 
 from datetime import datetime
-from astrbot.api.star import Context, Star, register, llm_tool
+from astrbot.api.star import Context, Star, register
+from astrbot.api.event.filter import llm_tool
 from astrbot.api import logger
 from .divination import divinate
 from .card import card as generate_card
