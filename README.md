@@ -79,6 +79,19 @@ astrbot_plugin_liuyao/
 └── metadata.yaml    # 插件信息
 ```
 
+## 配置（省 token）
+
+在 AstrBot 后台 → 插件管理 → 六爻数理占卜 → 设置，可调整以下参数：
+
+| 参数 | 说明 | 建议值 |
+|------|------|--------|
+| `card_enabled` | 是否生成卡片图片。关闭则只返回文字 | 群聊开，私聊可关 |
+| `detail_level` | 精简=只出分数，标准=+成因，完整=+排盘 | 标准 |
+| `max_history` | 保留最近几次记录到上下文，0为不保留 | 3 |
+| `daily_limit` | 每日最大调用次数，0为不限 | 0 |
+
+省 token 建议：`detail_level=精简` + `card_enabled=false`，每次调用约省 60% token。
+
 ## 免责声明
 
 - 本工具基于古籍理论，**结果仅供参考**

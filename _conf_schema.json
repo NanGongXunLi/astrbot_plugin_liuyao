@@ -1,0 +1,27 @@
+{
+  "card_enabled": {
+    "type": "bool",
+    "description": "是否输出卡片图片。关闭则只返回文字，省token。",
+    "default": true
+  },
+  "detail_level": {
+    "type": "enum",
+    "description": "解卦详细程度。精简=只出分数，标准=分数+成因，完整=分数+成因+排盘",
+    "default": "标准",
+    "choices": ["精简", "标准", "完整"]
+  },
+  "max_history": {
+    "type": "int",
+    "description": "保留最近N次算卦记录在上下文中，防上下文超长。0为不保留。",
+    "default": 3,
+    "min": 0,
+    "max": 10
+  },
+  "daily_limit": {
+    "type": "int",
+    "description": "每日最大调用次数，0为不限。",
+    "default": 0,
+    "min": 0,
+    "max": 999
+  }
+}

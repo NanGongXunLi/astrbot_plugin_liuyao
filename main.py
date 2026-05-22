@@ -13,6 +13,7 @@ from datetime import datetime
 from astrbot.api.star import Context, Star, register
 from astrbot.api.event.filter import llm_tool
 from astrbot.api import logger
+from astrbot.core.config.astrbot_config import AstrBotConfig
 from astrbot.core.message.message_event_result import MessageChain
 from .divination import divinate
 from .card import card as generate_card
@@ -54,10 +55,13 @@ def _patch_core_send():
 
 
 class LiuYaoPlugin(Star):
-    def __init__(self, context: Context):
+    def __init__(self, context: Context, config: AstrBotConfig = None):
         super().__init__(context)
+        self.config = config or {}
+        self.card_enabled = getattr(self.config, 'card_enabled', True)
+        self.detail_level = getattr(self.config, 'detail_level', '标准')
         _patch_core_send()
-        logger.info("六爻数理占卜插件已加载")
+        logger.info(f"六爻数理占卜插件已加载 (卡片={'开' if self.card_enabled else '关'} 详细={self.detail_level})")
 
     @llm_tool("liuyao_divinate")
     async def liuyao_divinate(self, event, numbers: list, question: str = ""):
