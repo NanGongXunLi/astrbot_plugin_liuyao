@@ -39,9 +39,9 @@ def _patch_core_send():
             return
         # 修补 _dispatch_send 中的类型转换
         old = r'(# session_id 必须是纯数字字符串)\s+session_id_int = \(\s+int\(session_id\) if session_id and session_id\.isdigit\(\) else None\s+\)'
-        new = r'\1
+        new = r'''\1
         session_id_str = str(session_id) if session_id is not None else ""
-        session_id_int = int(session_id_str) if session_id_str.isdigit() else None'
+        session_id_int = int(session_id_str) if session_id_str.isdigit() else None'''
         if re.search(old, src):
             src = re.sub(old, new, src)
             with open(mod.__file__, "w", encoding="utf-8") as f:
