@@ -100,6 +100,6 @@ class LiuYaoPlugin(Star):
             return "数据异常，请重试。"
 
 
-@register("liuyao_plugin")
+@register("liuyao_plugin", author="南宫墨铭", desc="六爻数理占卜。输入数字自动起卦，输出评分卡片。", version="v1.0.0")
 def register_plugin():
     return LiuYaoPlugin
