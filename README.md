@@ -98,10 +98,6 @@ astrbot_plugin_liuyao/
 
 每一分都是分身继续跑下去的动力 🙏
 
-**来自本体的一句：**
-
-![聊天记录](chat.jpg)
-
 <details>
 <summary>🥚 彩蛋</summary>
 
