@@ -13,6 +13,7 @@ from datetime import datetime
 from astrbot.api.star import Context, Star, register
 from astrbot.api.event.filter import llm_tool
 from astrbot.api import logger
+from astrbot.core.message.message_event_result import MessageChain
 from .divination import divinate
 from .card import card as generate_card
 from .data import wuxing_ke
@@ -90,16 +91,20 @@ class LiuYaoPlugin(Star):
 
             card_path = generate_card(result)
             
-            # 发图（使用正确的MessageChain格式）
+            # 尝试事件发图
+            img_sent = False
             try:
                 from astrbot.core.message.message_event_result import MessageChain
                 if event:
                     await event.send(MessageChain().file_image(card_path))
-            except Exception as reply_err:
-                from astrbot.api import logger as lg
-                lg.error(f"liuyao发图失败: {reply_err}")
+                    img_sent = True
+            except Exception:
+                pass
             
-            return ""
+            if img_sent:
+                return "【卦象卡片已发送】"
+            else:
+                return f"【卦象卡片】图片路径: {card_path}"
 
         except Exception as e:
             logger.error(f"占卜出错: {e}")
