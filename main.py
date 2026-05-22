@@ -90,19 +90,11 @@ class LiuYaoPlugin(Star):
 
             card_path = generate_card(result)
             
-            # 发图（兼容私聊和群聊）
+            # 发图（使用正确的MessageChain格式）
             try:
-                if event and hasattr(event, 'reply'):
-                    await event.reply([{"type": "image", "path": card_path}])
-                elif event and hasattr(event, 'send'):
-                    await event.send([{"type": "image", "path": card_path}])
-                elif event and hasattr(event, 'respond'):
-                    await event.respond([{"type": "image", "path": card_path}])
-                else:
-                    await self.context.send_message(
-                        event.unified_msg_origin,
-                        [{"type": "image", "path": card_path}]
-                    )
+                from astrbot.core.message.message_event_result import MessageChain
+                if event:
+                    await event.send(MessageChain().file_image(card_path))
             except Exception as reply_err:
                 from astrbot.api import logger as lg
                 lg.error(f"liuyao发图失败: {reply_err}")
