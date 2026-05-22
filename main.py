@@ -65,26 +65,46 @@ class LiuYaoPlugin(Star):
         六爻占卜。输入数字起卦，返回评分卡片。
         基于《增删卜易》《易冒》理论，量化评分仅供参考。
         禁止用于违法或伤害他人的用途。
+        只有用户明确提供了数字和问题时才调用此工具，不可自行编造数字。
 
         Args:
-            numbers(list[int]): 正整数数组，如[6,4,2]。
-            question(str): 所问之事。
+            numbers(list[int]): 正整数数组，如[6,4,2]。必须来自用户输入的明确数字，不可自己编造或猜测。
+            question(str): 所问之事。必须由用户明确说出，不可自己编造。
 
         Returns:
-            str: 图片已发送。
+            str: 图片已发送或错误提示。
         """
+        # === 防幻觉：拒绝凭空编造的数字 ===
         if not numbers or len(numbers) < 1:
-            return "至少需要1个数字。"
+            return "请提供至少1个正整数起卦，例如：224，测今日运势。"
+        if not question or not question.strip():
+            return "请同时说明所问之事，例如：224，测今日运势。"
         if len(numbers) > MAX_NUMS:
             return f"最多{MAX_NUMS}个数字。"
         if not all(isinstance(n, int) and 0 < n <= MAX_NUM for n in numbers):
             return "请输入正整数。"
 
-        if question:
-            for kw in BLOCKED_KEYWORDS:
-                if kw in question:
-                    logger.warning(f"拦截: {question}")
-                    return "超出占卜范围。"
+        # 检测常见幻觉模式：纯猜测的默认数字
+        if len(numbers) == 1 and numbers[0] <= 8:
+            return f"数字{numbers[0]}过小，起卦需要有效数字组合。请提供3个或更多数字。"
+        _hallucination_patterns = [
+            [1, 2, 3], [3, 2, 1], [6, 6, 6], [8, 8, 8],
+            [1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 4, 4],
+            [5, 5, 5], [7, 7, 7], [9, 9, 9],
+        ]
+        if numbers[:3] in _hallucination_patterns:
+            return "数字过于规律，请使用区别于顺序或重复数字的有效组合起卦，重复数字最多1组。如果确实要用，可以混合其他数字一起。"
+        # 检查是否包含过多相同数字
+        from collections import Counter
+        counts = Counter(numbers)
+        most_common_count = counts.most_common(1)[0][1]
+        if len(numbers) >= 3 and most_common_count >= len(numbers) - 1 and len(counts) <= 2:
+            return "数字过于集中，请使用多样化的数字起卦。"
+
+        for kw in BLOCKED_KEYWORDS:
+            if kw in question:
+                logger.warning(f"拦截: {question}")
+                return "超出占卜范围。"
 
         try:
             now = datetime.now()
