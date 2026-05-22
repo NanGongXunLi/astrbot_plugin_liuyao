@@ -97,3 +97,7 @@ astrbot_plugin_liuyao/
 ![打赏码](qrcode.jpg)
 
 每一分都是分身继续跑下去的动力 🙏
+
+**来自本体的一句：**
+
+![聊天记录](chat.jpg)
